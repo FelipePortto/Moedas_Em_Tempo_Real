@@ -1,0 +1,120 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cotações de Moedas</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: #f4f6f8;
+      color: #333;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    .container {
+      background: #ffffff;
+      padding: 2rem 3rem;
+      border-radius: 12px;
+      box-shadow: 0 8px 16px rgba(0,0,0,0.08);
+      text-align: center;
+      width: 100%;
+      max-width: 400px;
+    }
+
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: #1a202c;
+    }
+
+    .moeda {
+      margin: 1.2rem 0;
+      padding: 1rem;
+      background-color: #f0f4f8;
+      border-radius: 8px;
+    }
+
+    .moeda span {
+      display: block;
+      font-size: 1.5rem;
+      font-weight: 600;
+    }
+
+    .moeda small {
+      font-size: 0.9rem;
+      color: #666;
+    }
+
+    footer {
+      margin-top: 1.5rem;
+      font-size: 0.8rem;
+      color: #888;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>💰 Cotações de Moedas</h1>
+
+    <div class="moeda">
+      <strong>🇺🇸 Dólar (USD)</strong>
+      <span id="dolar">Carregando...</span>
+      <small id="data-dolar"></small>
+    </div>
+
+    <div class="moeda">
+      <strong>🇪🇺 Euro (EUR)</strong>
+      <span id="euro">Carregando...</span>
+      <small id="data-euro"></small>
+    </div>
+
+    <footer>
+      Dados fornecidos pelo Banco Central do Brasil (BACEN)
+    </footer>
+  </div>
+
+  <script>
+    async function buscarCotacoes() {
+      try {
+        const [resDolar, resEuro] = await Promise.all([
+          fetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.1/dados/ultimos/1?formato=json'),
+          fetch('https://api.bcb.gov.br/dados/serie/bcdata.sgs.21619/dados/ultimos/1?formato=json')
+        ]);
+
+        const dataDolar = await resDolar.json();
+        const dataEuro = await resEuro.json();
+
+        const valorDolar = parseFloat(dataDolar[0].valor).toFixed(2);
+        const dataCotacaoDolar = dataDolar[0].data;
+
+        const valorEuro = parseFloat(dataEuro[0].valor).toFixed(2);
+        const dataCotacaoEuro = dataEuro[0].data;
+
+        document.getElementById('dolar').textContent = `R$ ${valorDolar}`;
+        document.getElementById('data-dolar').textContent = `Cotação de ${dataCotacaoDolar}`;
+
+        document.getElementById('euro').textContent = `R$ ${valorEuro}`;
+        document.getElementById('data-euro').textContent = `Cotação de ${dataCotacaoEuro}`;
+
+      } catch (error) {
+        console.error('Erro ao buscar cotações:', error);
+        document.getElementById('dolar').textContent = 'Erro ao carregar';
+        document.getElementById('euro').textContent = 'Erro ao carregar';
+      }
+    }
+
+    buscarCotacoes();
+  </script>
+</body>
+</html>
